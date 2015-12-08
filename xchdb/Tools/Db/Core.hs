@@ -31,6 +31,8 @@ module Tools.Db.Core
           , dbMv
           ) where
 
+import Data.List
+import Data.Function
 import Control.Applicative
 import Control.Monad
 import Control.Monad.Error
@@ -64,7 +66,9 @@ dbExists = call comCitrixXenclientDbExists
 
 -- List child paths of a given node
 dbListPaths :: (MonadRpc e m) => Path -> m [Path]
-dbListPaths path = map prefixPath <$> dbList path
+dbListPaths path = do 
+    paths <- dbList path 
+    return $ map prefixPath (sortBy (compare `on` (read :: String->Int)) paths)
   where prefixPath y = path ++ "/" ++ y
 
 -- Remove a node with subnodes
