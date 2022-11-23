@@ -17,12 +17,12 @@ library
     containers,
     json,
     xchutils,
-    xch-rpc
+    xch-rpc,
+    rpc-autogen
 
   exposed-modules:
     Tools.Db
 
   other-modules:
-    Rpc.Autogen.DbClient
     Tools.Db.Core
     Tools.Db.Marshall
