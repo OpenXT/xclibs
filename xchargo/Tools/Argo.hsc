@@ -35,7 +35,7 @@ import Foreign
 import Foreign.C.Types
 import Foreign.C.Error
 import System.Posix.Types
-import Network.Socket ( SocketType, packSocketType )
+import Network.Socket.Types ( SocketType, packSocketType )
 import System.IO
 import System.IO.Error
 import System.Posix.IO
