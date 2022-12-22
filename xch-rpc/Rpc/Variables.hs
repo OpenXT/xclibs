@@ -16,7 +16,7 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
-{-# LANGUAGE TypeSynonymInstances,ScopedTypeVariables,FlexibleInstances,UndecidableInstances,OverlappingInstances,PatternGuards,FlexibleContexts #-}
+{-# LANGUAGE TypeSynonymInstances,ScopedTypeVariables,FlexibleInstances,UndecidableInstances,OverlappingInstances,PatternGuards,FlexibleContexts,ConstrainedClassMethods #-}
 
 module Rpc.Variables
        ( DBusTypeable (..)

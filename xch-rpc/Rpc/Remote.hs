@@ -19,7 +19,7 @@
 {-# LANGUAGE DeriveDataTypeable, FlexibleInstances, UndecidableInstances, OverlappingInstances #-}
 module Rpc.Remote where
 
-import Data.Typeable
+import Data.Typeable hiding (Proxy)
 import Data.String
 import qualified Data.Text.Lazy as TL
 import Control.Exception (Exception(..), throwIO)
