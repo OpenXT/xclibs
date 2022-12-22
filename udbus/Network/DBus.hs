@@ -59,7 +59,7 @@ import Network.DBus.StdMessage
 import Network.DBus.Internal
 import Control.Concurrent (forkIO, ThreadId)
 import Control.Concurrent.MVar
-import Control.Exception
+import Control.Exception hiding (TypeError)
 import Data.Maybe
 import Control.Monad
 import qualified Data.Map as M
