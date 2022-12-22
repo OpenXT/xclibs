@@ -19,7 +19,6 @@
 module Tools.Misc (
                split
              , splitBy
-             , void
              , differenceList
              , schedule, reschedule, ScheduledTask
              ) where
@@ -31,9 +30,6 @@ import Data.Time
 import System.Process
 import System.IO
 import System.Exit
-
-void :: Functor f => f a -> f ()
-void = fmap (const ())
 
 -- Split a list over an element
 split :: (Eq a) => a -> [a] -> [[a]]
