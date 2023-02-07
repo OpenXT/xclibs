@@ -21,6 +21,7 @@ module Network.DBus.IntrospectParser where
 
 import Text.XML.HaXml.XmlContent
 import Text.XML.HaXml.OneOfN
+import Text.XML.HaXml.Types
 
 
 {-Type decls-}
@@ -88,7 +89,7 @@ instance HTypeable Node where
     toHType x = Defined "node" [] []
 instance XmlContent Node where
     toContents (Node as a) =
-        [CElem (Elem "node" (toAttrs as) (concatMap toContents a)) ()]
+        [CElem (Elem (N "node") (toAttrs as) (concatMap toContents a)) ()]
     parseContents = do
         { e@(Elem _ as _) <- element ["node"]
         ; interior e $ return (Node (fromAttrs as))
@@ -117,7 +118,7 @@ instance HTypeable Interface where
     toHType x = Defined "interface" [] []
 instance XmlContent Interface where
     toContents (Interface as a) =
-        [CElem (Elem "interface" (toAttrs as) (concatMap toContents a)) ()]
+        [CElem (Elem (N "interface") (toAttrs as) (concatMap toContents a)) ()]
     parseContents = do
         { e@(Elem _ as _) <- element ["interface"]
         ; interior e $ return (Interface (fromAttrs as))
@@ -150,7 +151,7 @@ instance HTypeable Method where
     toHType x = Defined "method" [] []
 instance XmlContent Method where
     toContents (Method as a) =
-        [CElem (Elem "method" (toAttrs as) (concatMap toContents a)) ()]
+        [CElem (Elem (N "method") (toAttrs as) (concatMap toContents a)) ()]
     parseContents = do
         { e@(Elem _ as _) <- element ["method"]
         ; interior e $ return (Method (fromAttrs as))
@@ -179,7 +180,7 @@ instance HTypeable Signal where
     toHType x = Defined "signal" [] []
 instance XmlContent Signal where
     toContents (Signal as a) =
-        [CElem (Elem "signal" (toAttrs as) (concatMap toContents a)) ()]
+        [CElem (Elem (N "signal") (toAttrs as) (concatMap toContents a)) ()]
     parseContents = do
         { e@(Elem _ as _) <- element ["signal"]
         ; interior e $ return (Signal (fromAttrs as))
@@ -208,7 +209,7 @@ instance HTypeable Arg where
     toHType x = Defined "arg" [] []
 instance XmlContent Arg where
     toContents as =
-        [CElem (Elem "arg" (toAttrs as) []) ()]
+        [CElem (Elem (N "arg") (toAttrs as) []) ()]
     parseContents = do
         { (Elem _ as []) <- element ["arg"]
         ; return (fromAttrs as)
@@ -228,19 +229,19 @@ instance XmlAttributes Arg where
 
 instance XmlAttrType Arg_direction where
     fromAttrToTyp n (n',v)
-        | n==n'     = translate (attr2str v)
+        | (N n)==n'     = translate (attr2str v)
         | otherwise = Nothing
       where translate "in" = Just Arg_direction_in
             translate "out" = Just Arg_direction_out
             translate _ = Nothing
-    toAttrFrTyp n Arg_direction_in = Just (n, str2attr "in")
-    toAttrFrTyp n Arg_direction_out = Just (n, str2attr "out")
+    toAttrFrTyp n Arg_direction_in = Just (N n, str2attr "in")
+    toAttrFrTyp n Arg_direction_out = Just (N n, str2attr "out")
 
 instance HTypeable Property where
     toHType x = Defined "property" [] []
 instance XmlContent Property where
     toContents (Property as a) =
-        [CElem (Elem "property" (toAttrs as) (concatMap toContents a)) ()]
+        [CElem (Elem (N "property") (toAttrs as) (concatMap toContents a)) ()]
     parseContents = do
         { e@(Elem _ as _) <- element ["property"]
         ; interior e $ return (Property (fromAttrs as))
@@ -261,21 +262,21 @@ instance XmlAttributes Property_Attrs where
 
 instance XmlAttrType Property_access where
     fromAttrToTyp n (n',v)
-        | n==n'     = translate (attr2str v)
+        | (N n)==n'     = translate (attr2str v)
         | otherwise = Nothing
       where translate "read" = Just Property_access_read
             translate "write" = Just Property_access_write
             translate "readwrite" = Just Property_access_readwrite
             translate _ = Nothing
-    toAttrFrTyp n Property_access_read = Just (n, str2attr "read")
-    toAttrFrTyp n Property_access_write = Just (n, str2attr "write")
-    toAttrFrTyp n Property_access_readwrite = Just (n, str2attr "readwrite")
+    toAttrFrTyp n Property_access_read = Just (N n, str2attr "read")
+    toAttrFrTyp n Property_access_write = Just (N n, str2attr "write")
+    toAttrFrTyp n Property_access_readwrite = Just (N n, str2attr "readwrite")
 
 instance HTypeable Annotation where
     toHType x = Defined "annotation" [] []
 instance XmlContent Annotation where
     toContents as =
-        [CElem (Elem "annotation" (toAttrs as) []) ()]
+        [CElem (Elem (N "annotation") (toAttrs as) []) ()]
     parseContents = do
         { (Elem _ as []) <- element ["annotation"]
         ; return (fromAttrs as)
