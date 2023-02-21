@@ -71,62 +71,62 @@ import qualified Network.DBus.Actions as D
 import qualified Data.ByteString as B
 import qualified Data.ByteString.UTF8 as UTF8
 
-data ObjectPath = ObjectPath { strObjectPath :: Text } deriving (Eq,Ord)
-data BusName = BusName { strBusName :: Text } deriving (Eq,Ord)
-data InterfaceName =  InterfaceName { strInterfaceName :: Text } deriving (Eq,Ord)
-data MemberName = MemberName { strMemberName :: Text } deriving (Eq,Ord)
-data ErrorName = ErrorName { strErrorName :: Text } deriving (Eq,Ord)
+data ObjectPath = ObjectPath { strObjectPath :: String } deriving (Eq,Ord)
+data BusName = BusName { strBusName :: String } deriving (Eq,Ord)
+data InterfaceName =  InterfaceName { strInterfaceName :: String } deriving (Eq,Ord)
+data MemberName = MemberName { strMemberName :: String } deriving (Eq,Ord)
+data ErrorName = ErrorName { strErrorName :: String } deriving (Eq,Ord)
 
-mkObjectPath :: Text -> Maybe ObjectPath
+mkObjectPath :: String -> Maybe ObjectPath
 mkObjectPath x
-  | TL.take 1 x == "/"
-  , TL.null (TL.filter invalid_ch x) = Just (ObjectPath x)
+  | take 1 x == "/"
+  , null (filter invalid_ch x) = Just (ObjectPath x)
   | otherwise = Nothing
     where
       invalid_ch = not . valid_ch
       valid_ch '_' = True
       valid_ch '/' = True
       valid_ch c = isAlphaNum c
-mkObjectPath_ x = fromMaybe (error $ "invalid object path: " ++ TL.unpack x) (mkObjectPath x)
+mkObjectPath_ x = fromMaybe (error $ "invalid object path: " ++ x) (mkObjectPath x)
 
-mkBusName :: Text -> Maybe BusName
+mkBusName :: String -> Maybe BusName
 mkBusName x
-  | TL.null x = Nothing
+  | null x = Nothing
   | otherwise = Just (BusName x)
-mkBusName_ x = fromMaybe (error $ "invalid bus name: " ++ TL.unpack x) (mkBusName x)
+mkBusName_ x = fromMaybe (error $ "invalid bus name: " ++ x) (mkBusName x)
 
-mkInterfaceName :: Text -> Maybe InterfaceName
+mkInterfaceName :: String -> Maybe InterfaceName
 mkInterfaceName x
-  | TL.null x = Nothing
+  | null x = Nothing
   | otherwise = Just (InterfaceName x)
-mkInterfaceName_ x = fromMaybe (error $ "invalid interface name: " ++ TL.unpack x) (mkInterfaceName x)
+mkInterfaceName_ x = fromMaybe (error $ "invalid interface name: " ++ x) (mkInterfaceName x)
 
-mkMemberName :: Text -> Maybe MemberName
+mkMemberName :: String -> Maybe MemberName
 mkMemberName x
-  | TL.null x = Nothing
+  | null x = Nothing
   | otherwise = Just (MemberName x)
-mkMemberName_ x = fromMaybe (error $ "invalid member name: " ++ TL.unpack x) (mkMemberName x)
+mkMemberName_ x = fromMaybe (error $ "invalid member name: " ++ x) (mkMemberName x)
 
-mkErrorName :: Text -> Maybe ErrorName
+mkErrorName :: String -> Maybe ErrorName
 mkErrorName x
-  | TL.null x = Nothing
+  | null x = Nothing
   | otherwise = Just (ErrorName x)
-mkErrorName_ x = fromMaybe (error $ "invalid error name: " ++ TL.unpack x) (mkErrorName x)
+mkErrorName_ x = fromMaybe (error $ "invalid error name: " ++ x) (mkErrorName x)
 
-instance IsString ObjectPath where fromString = mkObjectPath_ . TL.pack
-instance IsString BusName where fromString = mkBusName_ . TL.pack
-instance IsString InterfaceName where fromString = mkInterfaceName_ . TL.pack
-instance IsString MemberName where fromString = mkMemberName_ . TL.pack
-instance IsString ErrorName where fromString = mkErrorName_ . TL.pack
+instance IsString ObjectPath where fromString = mkObjectPath_
+instance IsString BusName where fromString = mkBusName_
+instance IsString InterfaceName where fromString = mkInterfaceName_
+instance IsString MemberName where fromString = mkMemberName_
+instance IsString ErrorName where fromString = mkErrorName_
 
 data RemoteObject = RemoteObject BusName ObjectPath
 data Proxy = Proxy RemoteObject InterfaceName
 
-instance Show ObjectPath where show (ObjectPath p) = TL.unpack p
-instance Show BusName where show (BusName n) = TL.unpack n
-instance Show InterfaceName where show (InterfaceName n) = TL.unpack n
-instance Show MemberName where show (MemberName n) = TL.unpack n                                  
-instance Show ErrorName where show (ErrorName n) = TL.unpack n
+instance Show ObjectPath where show (ObjectPath p) = p
+instance Show BusName where show (BusName n) = n
+instance Show InterfaceName where show (InterfaceName n) = n
+instance Show MemberName where show (MemberName n) = n
+instance Show ErrorName where show (ErrorName n) = n
 instance Show Proxy where
     show (Proxy remoteObj intf) =
         let RemoteObject service path = remoteObj in
@@ -145,8 +145,8 @@ data RpcCall =
              , callArgs    :: ![D.DBusValue]
              }
 
-callInterface = TL.unpack . strInterfaceName . callInterfaceT
-callMember = TL.unpack . strMemberName . callMemberT
+callInterface = strInterfaceName . callInterfaceT
+callMember = strMemberName . callMemberT
 
 data RpcSignal =
      RpcSignal { signalPath :: !ObjectPath
@@ -155,8 +155,8 @@ data RpcSignal =
                , signalArgs :: ![D.DBusValue]
                }
 
-signalInterface = TL.unpack . strInterfaceName . signalInterfaceT
-signalMember = TL.unpack . strMemberName . signalMemberT
+signalInterface = strInterfaceName . signalInterfaceT
+signalMember = strMemberName . signalMemberT
 
 instance Show RpcCall where
     show (RpcCall dest path intf member args) =
@@ -179,7 +179,7 @@ data RpcMethod m =
                , mtInvoke  :: [D.DBusValue] -> m [D.DBusValue]
                }
 
-mtName = TL.unpack . strMemberName . mtNameT
+mtName = strMemberName . mtNameT
 
 instance Show (RpcMethod m) where
     show m = show (mtName m)
@@ -190,7 +190,7 @@ data RpcProperty =
                  , propAccess :: !PropertyAccess }
      deriving (Eq, Show)
 
-propName = TL.unpack . strMemberName . propNameT
+propName = strMemberName . propNameT
 
 data PropertyAccess = Read | Write | ReadWrite deriving (Eq, Show)
 
