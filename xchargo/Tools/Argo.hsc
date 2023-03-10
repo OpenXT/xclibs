@@ -62,8 +62,6 @@ data Addr = Addr { addrPort  :: !Int
 
 #include <libargo.h>
 
-#let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
-
 instance Storable Addr where
     alignment _ = #{alignment xen_argo_addr_t}
     sizeOf    _ = #{size xen_argo_addr_t}

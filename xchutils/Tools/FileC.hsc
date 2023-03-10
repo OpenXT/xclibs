@@ -35,8 +35,6 @@ import qualified Data.ByteString.UTF8 as UTF8
 #include <unistd.h>
 #include <sys/vfs.h>
 
-#let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
-
 data StatFs = StatFs {
       statType :: Int32
     , statBsize :: Int32
