@@ -59,8 +59,6 @@ type WatchID = String -- equivalent to path in xs
 #include <xs.h>
 #include <xs_lib.h>
 
-#def typedef struct xs_permissions xs_permissions_t;
-
 foreign import ccall "xs.h xs_daemon_open"
         c_xs_daemon_open :: IO XsHandle
 
@@ -306,13 +304,13 @@ packPerms (PermOwner : xs) = xsPERM_OWNER .|. packPerms xs
 
 instance Storable Permission where
     alignment _ = alignment ( undefined :: CUInt )
-    sizeOf    _ = #{size xs_permissions_t}
-    peek p      = do id <- #{peek xs_permissions_t, id} p :: IO CUInt
-                     flags <- #{peek xs_permissions_t, perms} p
+    sizeOf    _ = #{size struct xs_permissions}
+    peek p      = do id <- #{peek struct xs_permissions, id} p :: IO CUInt
+                     flags <- #{peek struct xs_permissions, perms} p
                      return $ Permission (fromIntegral id) (unpackPerms flags)
     poke p v    = do let Permission id flags = v
-                     #{poke xs_permissions_t, id} p id
-                     #{poke xs_permissions_t, perms} p (packPerms flags)
+                     #{poke struct xs_permissions, id} p id
+                     #{poke struct xs_permissions, perms} p (packPerms flags)
 
 xsGetPermissionsH :: Xs -> String -> IO [Permission]
 xsGetPermissionsH xs path =
