@@ -38,28 +38,28 @@ introXml :: ObjectPath -> [RpcInterface m] -> Text
 introXml p ifaces =
   "<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\" \"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n"
   <+>
-  "<node name=" <+> quote (strObjectPath p) <+> " xmlns:tp=\"http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0\">\n"
+  "<node name=" <+> quote (TL.pack $ strObjectPath p) <+> " xmlns:tp=\"http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0\">\n"
   <+>
   TL.concat (map interfaceXml ifaces)
   <+> "</node>\n"
   
 interfaceXml :: RpcInterface m -> Text
 interfaceXml (RpcInterface name methods properties)
-   = "<interface name=" <+> quote (strInterfaceName name) <+> ">\n"
+   = "<interface name=" <+> quote (TL.pack $ strInterfaceName name) <+> ">\n"
  <+> TL.concat (map propertyXml properties)
  <+> TL.concat (map methodXml methods)
  <+> "</interface>\n"
 
 methodXml :: RpcMethod m -> Text
 methodXml (RpcMethod pin pout name _)
-   = "<method name=" <+> quote (strMemberName name) <+> ">\n"
+   = "<method name=" <+> quote (TL.pack $ strMemberName name) <+> ">\n"
  <+> TL.concat (map (argXml "in" ) pin)
  <+> TL.concat (map (argXml "out") pout)
  <+> "</method>\n"
 
 propertyXml :: RpcProperty -> Text
 propertyXml (RpcProperty typ name access)
-   = "<property name=" <+> quote (strMemberName name) <+> " type=" <+> quote (typeStr typ) <+> " access=" <+> quote accessS <+> "/>\n"
+   = "<property name=" <+> quote (TL.pack $ strMemberName name) <+> " type=" <+> quote (typeStr typ) <+> " access=" <+> quote accessS <+> "/>\n"
   where
     accessS = case access of
       Read      -> "read"

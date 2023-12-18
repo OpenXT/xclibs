@@ -35,7 +35,7 @@ import Foreign
 import Foreign.C.Types
 import Foreign.C.Error
 import System.Posix.Types
-import Network.Socket ( SocketType, packSocketType )
+import Network.Socket ( SocketType (..))
 import System.IO
 import System.IO.Error
 import System.Posix.IO
@@ -62,8 +62,6 @@ data Addr = Addr { addrPort  :: !Int
 
 #include <libargo.h>
 
-#let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
-
 instance Storable Addr where
     alignment _ = #{alignment xen_argo_addr_t}
     sizeOf    _ = #{size xen_argo_addr_t}
@@ -87,11 +85,14 @@ foreign import ccall "libargo.h argo_getsockopt" c_argo_getsockopt :: CInt -> CI
 int :: (Integral a, Num b) => a -> b
 int = fromIntegral
 
+sockStream = #const SOCK_STREAM
+
 socket :: SocketType -> IO Fd
-socket t =
-    do fd <- int <$> throwErrnoIfMinus1 "socket" ( c_argo_socket (packSocketType t) )
+socket Network.Socket.Stream =
+    do fd <- int <$> throwErrnoIfMinus1 "socket" ( c_argo_socket sockStream )
        setFdOption fd NonBlockingRead True
        return fd
+socket t = ioError (userError $ "SocketType " ++ show t ++ " not supported by argo")
 
 close :: Fd -> IO ()
 close f = throwErrnoIfMinus1 "close" ( c_argo_close (int f) ) >> return ()

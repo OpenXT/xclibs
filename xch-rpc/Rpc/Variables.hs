@@ -16,7 +16,7 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
-{-# LANGUAGE TypeSynonymInstances,ScopedTypeVariables,FlexibleInstances,UndecidableInstances,OverlappingInstances,PatternGuards,FlexibleContexts #-}
+{-# LANGUAGE TypeSynonymInstances,ScopedTypeVariables,FlexibleInstances,UndecidableInstances,OverlappingInstances,PatternGuards,FlexibleContexts,ConstrainedClassMethods #-}
 
 module Rpc.Variables
        ( DBusTypeable (..)
@@ -33,7 +33,9 @@ import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.UTF8 as BUTF8
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text.Lazy as TL
+import qualified Data.Text as T
 import qualified Data.Text.Lazy.Encoding as TLE
+import qualified Data.Text.Encoding as TE
 import qualified Data.Map as M
 import Data.Map (Map)
 import Rpc.Types
@@ -131,6 +133,12 @@ instance (Ord k, DBusTypeable k, DBusTypeable v) => DBusTypeable (Map k v) where
 
 -- | some mind numbing Variable instances
 
+-- Add this new one for strict Text
+instance Variable T.Text where
+  toVariant = D.DBusString . D.PackedString . TE.encodeUtf8
+  fromVariant (D.DBusString (D.PackedString x)) = Just (TE.decodeUtf8 x)
+  fromVariant _ = Nothing
+
 instance Variable TL.Text where
   toVariant = D.DBusString . D.PackedString . B.concat . BL.toChunks . TLE.encodeUtf8
   fromVariant (D.DBusString (D.PackedString x)) = Just (TLE.decodeUtf8 . BL.fromChunks . (:[]) $ x)
@@ -210,9 +218,9 @@ instance Variable D.DBusValue where
   fromVariant _ = Nothing
   
 instance Variable ObjectPath where
-  fromVariant (D.DBusObjectPath p) = Just . mkObjectPath_ . TL.pack $ show p
+  fromVariant (D.DBusObjectPath p) = Just . mkObjectPath_ $ show p
   fromVariant _ = Nothing
-  toVariant p = D.DBusObjectPath . fromString . TL.unpack . strObjectPath $ p
+  toVariant p = D.DBusObjectPath . fromString . strObjectPath $ p
   
 instance Variable D.SignatureElem where
   toVariant c = listToVariant [c]

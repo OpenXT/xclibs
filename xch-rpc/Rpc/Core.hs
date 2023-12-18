@@ -217,13 +217,13 @@ rpcMethod :: MonadRpc e m => String -> String -> String -> ( [Variant] -> m [Var
 rpcMethod name ins outs body = RpcMethod {
                               mtSigIn  = rpcParseSigStr ins
                             , mtSigOut = rpcParseSigStr outs
-                            , mtNameT  = mkMemberName_ $ T.pack name
+                            , mtNameT  = mkMemberName_ name
                             , mtInvoke = body
                             }
 
 rpcProperty :: String -> String -> PropertyAccess -> RpcProperty
 rpcProperty name typeSig access = RpcProperty {
-                                    propNameT= mkMemberName_ $ T.pack name
+                                    propNameT= mkMemberName_ name
                                   , propType = typ
                                   , propAccess = access }
     where

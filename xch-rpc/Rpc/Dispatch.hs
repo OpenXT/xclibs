@@ -131,7 +131,7 @@ sendWithReply d msg
 
 sendErrorReply :: Dispatcher -> Serial -> (Maybe BusName) -> ErrorName -> [D.DBusValue] -> IO ()
 sendErrorReply di s to err args =
-  send' di to . D.toDBusMessage $ D.DBusError s (TL.unpack $ strErrorName err) args
+  send' di to . D.toDBusMessage $ D.DBusError s (strErrorName err) args
 
 sendReturnReply :: Dispatcher -> Serial -> (Maybe BusName) -> [Variant] -> IO ()
 sendReturnReply di s to args =
@@ -172,7 +172,7 @@ emit d = send d (const $ return()) . signalToDbusMsg
 matchesSignal :: D.DBusMatchRules -> Received -> Bool
 matchesSignal r (ReceivedSignal _ sender sig)
   = all ( ==True ) 
-    [ m (D.matchSender r) ((TL.unpack.strBusName) `fmap` sender)
+    [ m (D.matchSender r) ((strBusName) `fmap` sender)
     , m (D.matchInterface r) (Just $ D.signalInterface sig)
     , m (D.matchMember r) (Just $ D.signalMember sig)
     , m (D.matchPath r) (Just $ D.signalPath sig)
@@ -234,10 +234,10 @@ hookSignalFrom :: Dispatcher
 hookSignalFrom di dst path iface memb handler
   = hookSignal di mr (\_ s -> handler s) where
     mr = D.DBusMatchRules { D.matchType = Nothing
-                          , D.matchSender = Just (TL.unpack $ strBusName $ dst)
-                          , D.matchInterface = Just (TL.unpack $ strInterfaceName $ iface)
-                          , D.matchMember = Just (TL.unpack $ strMemberName $ memb)
-                          , D.matchPath = Just (fromString $ TL.unpack $ strObjectPath $ path)
+                          , D.matchSender = Just (strBusName $ dst)
+                          , D.matchInterface = Just (strInterfaceName $ iface)
+                          , D.matchMember = Just (strMemberName $ memb)
+                          , D.matchPath = Just (fromString $ strObjectPath $ path)
                           , D.matchDestination = Nothing
                           }
 
@@ -333,26 +333,26 @@ handle di m@(ReceivedReturn serial from ret) = do
 handle _ _ = warn "invalid message received"
 
 destination :: D.DBusMessage -> Maybe BusName
-destination m = mkBusName_ . TL.pack <$> D.fieldsDestination (D.msgFields m)
+destination m = mkBusName_ <$> D.fieldsDestination (D.msgFields m)
 
 sender :: D.DBusMessage -> Maybe BusName
-sender m = mkBusName_ . TL.pack <$> D.fieldsSender (D.msgFields m)
+sender m = mkBusName_ <$> D.fieldsSender (D.msgFields m)
 
 setDestination :: BusName -> D.DBusMessage -> D.DBusMessage
 setDestination n m =
   m { D.msgFields = (D.msgFields m) { D.fieldsDestination = Just n' } }
-  where n' = TL.unpack $ strBusName n
+  where n' = strBusName n
 
 -- conversions
 callToDbusMsg :: RpcCall -> D.DBusMessage
 callToDbusMsg c =
   setDestination (callDest c) $ D.toDBusMessage c'
   where
-    dest' = TL.unpack $ strBusName $ callDest c
+    dest' = strBusName $ callDest c
     c' =
-      D.DBusCall { D.callPath = fromString (TL.unpack $ strObjectPath $ callPath c)
-                 , D.callMember = TL.unpack $ strMemberName $ callMemberT c
-                 , D.callInterface = Just $ TL.unpack $ strInterfaceName $ callInterfaceT c
+      D.DBusCall { D.callPath = fromString (strObjectPath $ callPath c)
+                 , D.callMember = strMemberName $ callMemberT c
+                 , D.callInterface = Just $ strInterfaceName $ callInterfaceT c
                  , D.callBody = callArgs c
                  }
 
@@ -361,9 +361,9 @@ signalToDbusMsg s =
   D.toDBusMessage s'
   where
     s' =
-      D.DBusSignal { D.signalPath = fromString . TL.unpack . strObjectPath $ signalPath s
-                   , D.signalMember = TL.unpack . strMemberName $ signalMemberT s
-                   , D.signalInterface = TL.unpack . strInterfaceName $ signalInterfaceT s
+      D.DBusSignal { D.signalPath = fromString . strObjectPath $ signalPath s
+                   , D.signalMember = strMemberName $ signalMemberT s
+                   , D.signalInterface = strInterfaceName $ signalInterfaceT s
                    , D.signalBody = signalArgs s }
 
 unknownObject, unknownMethod, failed, internalFailed :: ErrorName
